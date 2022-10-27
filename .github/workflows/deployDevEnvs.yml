@@ -16,7 +16,7 @@ jobs:
       - name: Download build/libs
         uses: actions/download-artifact@v3
         with:
-          name: package
+          name: Package
       - name: print files.
         run: |
           for f in build/libs/*.jar; do

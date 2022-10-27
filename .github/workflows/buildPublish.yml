@@ -4,8 +4,19 @@ on:
   workflow_call:
 
 jobs:
-  test:
+  workflow:
     runs-on: ubuntu-latest
     steps:
-      - name: Print Hello World
-        run: echo "Hello from build and publish workflow!"
+      - name: Print workflow
+        run: echo "Workflow - Build and Publish"
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: gradle/gradle-build-action@v2
+      - name: Run build with Gradle Wrapper
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build

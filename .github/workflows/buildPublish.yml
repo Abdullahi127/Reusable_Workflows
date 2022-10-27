@@ -1,0 +1,11 @@
+name: Build and Publish
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Hello World
+        run: echo "Hello from build and publish workflow!"

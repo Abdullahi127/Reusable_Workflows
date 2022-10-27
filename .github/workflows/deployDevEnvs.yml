@@ -4,8 +4,20 @@ on:
   workflow_call:
 
 jobs:
-  test:
+  workflow:
     runs-on: ubuntu-latest
     steps:
-      - name: Workflow
-        run: echo "Hello from deployment of dev environments workflow!"
+      - name: Print workflow
+        run: echo "Workflow - Deployment"
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build/libs
+        uses: actions/download-artifact@v3
+        with:
+          name: package
+        run: |
+          for f in build/libs/*.jar; do 
+            echo ${f};
+          done;

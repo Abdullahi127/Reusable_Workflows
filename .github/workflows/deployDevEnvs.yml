@@ -17,7 +17,8 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: package
+      - name: print files.
         run: |
-          for f in build/libs/*.jar; do 
-            echo ${f};
+          for f in build/libs/*.jar; do
+          echo ${f};
           done;

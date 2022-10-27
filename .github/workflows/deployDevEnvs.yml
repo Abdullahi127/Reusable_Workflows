@@ -28,6 +28,6 @@ jobs:
 
       - name: print files.
         run: |
-          for f in build/libs/*.jar; do
+          for f in ${{steps.download.outputs.download-path}}/*.jar; do
           echo ${f};
           done;

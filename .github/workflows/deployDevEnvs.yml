@@ -28,7 +28,7 @@ jobs:
             then
               echo "$FILE";
               mkdir deploy;
-              cp -r "$FILE" "./deploy/"
+              cp -r "$FILE" "${HOME}/deploy/"
             else
               echo "No match: $FILE";
             fi  

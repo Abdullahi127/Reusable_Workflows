@@ -33,3 +33,8 @@ jobs:
               echo "No match: $FILE";
             fi  
           done;
+      - name: Print Deploy Folder
+        run: |
+          for FILE in ${HOME}/deploy/*.jar; do
+            echo "File $FILE";
+          done;

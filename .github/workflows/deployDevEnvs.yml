@@ -28,6 +28,7 @@ jobs:
 
       - name: print files.
         run: |
-          for f in ${{steps.download.outputs.download-path}}/*[0-9]+.jar; do
-          echo ${f};
+          for f in ${{steps.download.outputs.download-path}}/*.jar; do
+          echo "The file: "
+          echo "${f}";
           done;

@@ -28,13 +28,13 @@ jobs:
             then
               echo "$FILE";
               mkdir deploy;
-              cp -r "$FILE" "${HOME}/deploy/"
+              cp -r "$FILE" "${GITHUB_WORKSPACE}/deploy/"
             else
               echo "No match: $FILE";
             fi  
           done;
       - name: Print Deploy Folder
         run: |
-          for FILE in ${HOME}/deploy/*.jar; do
+          for FILE in ${GITHUB_WORKSPACE}/deploy/*.jar; do
             echo "File $FILE";
           done;

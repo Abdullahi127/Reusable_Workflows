@@ -33,5 +33,6 @@ jobs:
             if[[ "$FILE" =~ "$regex"]]
               echo "$FILE";
             else
-              echo "No match: $FILE";  
+              echo "No match: $FILE";
+            fi  
           done;

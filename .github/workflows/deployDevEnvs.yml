@@ -30,7 +30,8 @@ jobs:
         run: |
           regex="[0-9]\.[0-9]\.[0-9]\.jar"
           for FILE in ${{steps.download.outputs.download-path}}/*.jar; do
-            if[[ "$FILE" =~ "$regex"]]
+            if[[ "$FILE" =~ "$regex" ]]
+            then
               echo "$FILE";
             else
               echo "No match: $FILE";

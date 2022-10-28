@@ -27,6 +27,8 @@ jobs:
             if [[ $FILE =~ $regex ]];
             then
               echo "$FILE";
+              mkdir deploy;
+              cp -r "$FILE" "./deploy/"
             else
               echo "No match: $FILE";
             fi  

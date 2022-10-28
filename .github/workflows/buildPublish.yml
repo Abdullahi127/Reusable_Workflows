@@ -4,15 +4,8 @@ on:
   workflow_call:
 
 jobs:
-  workflow:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print workflow
-        run: echo "Workflow - Build and Publish"
-
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
       - uses: gradle/gradle-build-action@v2

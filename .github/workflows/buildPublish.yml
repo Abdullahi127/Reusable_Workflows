@@ -14,7 +14,7 @@ jobs:
 
       - name: Current branch.
         run: |
-          echo "GITHUB_REPOSITORY: ${GITHUB_REPOSITORY}"
+          echo "GITHUB_REF: ${GITHUB_REF}"
 
       - name: upload json file.
         uses: actions/upload-artifact@v3
@@ -28,7 +28,7 @@ jobs:
           ref: dev
       - name: Current branch.
         run: |
-          echo "GITHUB_REPOSITORY: ${GITHUB_REPOSITORY}"
+          echo "GITHUB_REF: ${GITHUB_REF}"
 
   build:
     needs: versions
@@ -37,7 +37,7 @@ jobs:
       - uses: actions/download-artifact@v3
         id: download
         with:
-          name: Package
+          name: Versions
           path: path/to/artifacts
       - name: Get current version
         run: |

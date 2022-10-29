@@ -6,6 +6,16 @@ on:
 jobs:
   getVersions:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: git switch version
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Versions
+          path: ./versions.json
+          retention-days: 1
+      - name: switch to dev branch
+        run: git switch dev
 
   build:
     runs-on: ubuntu-latest
@@ -16,9 +26,9 @@ jobs:
         with:
           name: Package
           path: path/to/artifacts
-          run: |
-            echo ${{steps.download.outputs.download-path}}/versions.json
-            echo "I should be Github Action!"
+      - run: |
+          echo ${{steps.download.outputs.download-path}}/versions.json
+          echo "I should be Github Action!"
       - uses: gradle/gradle-build-action@v2
       - name: Run build with Gradle Wrapper
         run: |

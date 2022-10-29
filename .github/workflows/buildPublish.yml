@@ -30,3 +30,13 @@ jobs:
         run: |
           echo ${{steps.download.outputs.download-path}}/versions.json
           echo "I should be Github Action!"
+      - uses: gradle/gradle-build-action@v2
+      - name: Gradle build
+        run: |
+          chmod +x ./gradlew
+          ./gradlew setCurrentVersion --projectVersion=0.10.0 --alias=core clean build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Package
+          path: build/libs
+          retention-days: 1

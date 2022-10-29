@@ -4,24 +4,16 @@ on:
   workflow_call:
 
 jobs:
-  build:
+  getVersions:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v3
-        id: download
-        with:
-          name: Package
-          path: path/to/artifacts
-      - name: Get current version
-        run: |
-          echo ${{steps.download.outputs.download-path}}/versions.json
-          echo "I should be Github Action!"
-      - uses: gradle/gradle-build-action@v2
-        run: |
-          chmod +x ./gradlew
-          ./gradlew setCurrentVersion --projectVersion=0.10.0 --alias=core clean build
+      - uses: actions/checkout@v3
+      - name: switch to version
+        run: git switch version
       - uses: actions/upload-artifact@v3
         with:
-          name: Package
-          path: build/libs
+          name: Versions
+          path: ./versions.json
           retention-days: 1
+      - name: switch to dev branch
+        run: git switch dev

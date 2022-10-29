@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: switch to version
         run: git switch version
       - uses: actions/upload-artifact@v3
         with:

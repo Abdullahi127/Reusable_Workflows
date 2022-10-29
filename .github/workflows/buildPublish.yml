@@ -4,20 +4,6 @@ on:
   workflow_call:
 
 jobs:
-  getVersions:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: switch to version
-        run: git switch version
-      - uses: actions/upload-artifact@v3
-        with:
-          name: Versions
-          path: ./versions.json
-          retention-days: 1
-      - name: switch to dev branch
-        run: git switch dev
-
   build:
     runs-on: ubuntu-latest
     steps:

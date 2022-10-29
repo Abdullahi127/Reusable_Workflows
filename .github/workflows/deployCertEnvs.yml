@@ -8,4 +8,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Workflow
-        run: echo "Hello from deployment of cert environments workflow!"
+      - run: echo "Hello from deployment of cert environments workflow!"

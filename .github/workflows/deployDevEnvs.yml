@@ -1,4 +1,4 @@
-name: Deploy; Dev environments.
+name: Deploy=Dev environments.
 
 on:
   workflow_call:

@@ -1,4 +1,4 @@
-name: Deploy; Cert environments.
+name: Deploy=Cert environments.
 
 on:
   workflow_call:

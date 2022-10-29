@@ -7,16 +7,21 @@ jobs:
   versions:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: switch to version
-        run: git switch version
-      - uses: actions/upload-artifact@v3
+      - name: Checkout version repo
+        uses: actions/checkout@v3
+        with:
+          ref: version
+
+      - name: upload json file.
+        uses: actions/upload-artifact@v3
         with:
           name: Versions
           path: ./versions.json
           retention-days: 1
-      - name: switch to dev branch
-        run: git switch dev
+      - name: checkout dev repo
+        uses: actions/checkout@v3
+        with:
+          ref: dev
 
   build:
     needs: versions

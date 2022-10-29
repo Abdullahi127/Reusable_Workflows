@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  getVersions:
+  versions:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -19,6 +19,7 @@ jobs:
         run: git switch dev
 
   build:
+    needs: versions
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v3

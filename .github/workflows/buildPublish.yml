@@ -4,15 +4,42 @@ on:
   workflow_call:
 
 jobs:
+  getVersions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: switch to version branch
+        run: git switch version
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Versions
+          path: ./versions.json
+          retention-days: 1
+      - name: switch to dev branch
+        run: git switch dev
+
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: gradle/gradle-build-action@v2
+      - uses: actions/download-artifact@v3
+
+      - name: download versions
+        id: download
+        with:
+          name: Package
+          path: path/to/artifacts
+
+      - name: get core version
+        run: |
+          echo ${{steps.download.outputs.download-path}}/versions.json
+          echo "I should be Github Action!"
+
       - name: Run build with Gradle Wrapper
         run: |
           chmod +x ./gradlew
-          ./gradlew build
+          ./gradlew setCurrentVersion --projectVersion=0.10.0 --alias=core clean build
       - uses: actions/upload-artifact@v3
         with:
           name: Package

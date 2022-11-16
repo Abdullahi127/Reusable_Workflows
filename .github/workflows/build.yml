@@ -150,30 +150,49 @@ jobs:
         run: |
           chmod +x ./gradlew
           ./gradlew core:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-core-version }} --alias=core core:build
+          echo "core-build-path=./core/build/libs" >> $GITHUB_ENV
 
-      - name: build and publish adp
+      - name: build adp
         if: ${{ needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         run: |
           chmod +x ./gradlew
           ./gradlew adp:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-adp-version }} --alias=adp adp:build
+          echo "adp-build-path=./adp/build/libs" >> $GITHUB_ENV
 
-      - name: build and publish dp
+      - name: build dp
         if: ${{ needs.check-diff.outputs.dp-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         run: |
           chmod +x ./gradlew 
           ./gradlew dp:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-dp-version }} --alias=dp dp:build
+          echo "dp-build-path=./dp/build/libs" >> $GITHUB_ENV
 
-      - name: build and publish oc
+      - name: build oc
         if: ${{ needs.check-diff.outputs.oc-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         run: |
           chmod +x ./gradlew
           ./gradlew oc:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-oc-version }} --alias=oc oc:build
+          echo "oc-build-path=./oc/build/libs" >> $GITHUB_ENV
 
-      - name: build and publish sim
+      - name: build sim
         if: ${{ needs.check-diff.outputs.sim-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         run: |
           chmod +x ./gradlew 
           ./gradlew sim:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-sim-version }} --alias=sim build
+          echo "sim-build-path=./sim/build/libs" >> $GITHUB_ENV
+
+      - name: copy sim jar.
+        run: |
+          regex="[0-9]\.[0-9]\.[0-9]\.jar"
+          for FILE in ${{ env.sim-build-path }}/*.jar; do
+            if [[ $FILE =~ $regex ]];
+            then
+              echo "$FILE";
+              mkdir deploy;
+              cp -r "$FILE" "${GITHUB_WORKSPACE}/deploy/"
+            else
+              echo "No match: $FILE";
+            fi  
+          done;
 
   version-updates:
     needs: [build, setup, check-diff]
@@ -247,64 +266,3 @@ jobs:
           git add ./versions.json
           git commit -m "Update versions"
           git push
-
-# jobs:
-#   versions:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout version repo
-#         uses: actions/checkout@v3
-#         with:
-#           ref: version
-
-#       - name: Current branch.
-#         run: |
-#           echo "GITHUB_REF: ${GITHUB_REF}"
-
-#       - name: upload json file.
-#         uses: actions/upload-artifact@v3
-#         with:
-#           name: Versions
-#           path: ./versions.json
-#           retention-days: 1
-
-#   build:
-#     needs: versions
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: checkout dev repo
-#         uses: actions/checkout@v3
-#         with:
-#           ref: dev
-
-#       - name: Current branch.
-#         run: |
-#           echo "GITHUB_REF: ${GITHUB_REF}"
-
-#       - uses: actions/download-artifact@v3
-#         id: download
-#         with:
-#           name: Versions
-#           path: path/to/artifacts
-
-#       - name: Get current version
-#         run: |
-#           echo ${{steps.download.outputs.download-path}}/versions.json
-#           echo "I should be Github Action!"
-
-#       - uses: actions/setup-java@v3
-#         with:
-#           distribution: temurin
-#           java-version: 17
-
-#       - uses: gradle/gradle-build-action@v2
-#       - name: Gradle build
-#         run: |
-#           chmod +x ./gradlew
-#           ./gradlew setCurrentVersion --projectVersion=0.10.0 --alias=core clean build
-
-#       - uses: actions/upload-artifact@v3
-#         with:
-#           name: Package
-#           path: build/libs
-#           retention-days: 1

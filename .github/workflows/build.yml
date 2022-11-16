@@ -193,6 +193,7 @@ jobs:
               echo "No match: $FILE";
             fi  
           done;
+          cat ./deploy
 
   version-updates:
     needs: [build, setup, check-diff]

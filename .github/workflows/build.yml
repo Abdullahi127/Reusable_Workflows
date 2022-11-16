@@ -88,11 +88,11 @@ jobs:
 
       #---- TODO Update Get next versions.
       - run: |
-          echo "env.next-core-version=1.0.0" >> $GITHUB_ENV
-          echo "env.next-adp-version=1.0.0" >> $GITHUB_ENV
-          echo "env.next-dp-version=1.0.0" >> $GITHUB_ENV
-          echo "env.next-oc-version=1.0.0" >> $GITHUB_ENV
-          echo "env.next-sim-version=1.0.0" >> $GITHUB_ENV
+          echo "next-core-version=1.0.0" >> $GITHUB_ENV
+          echo "next-adp-version=1.0.0" >> $GITHUB_ENV
+          echo "next-dp-version=1.0.0" >> $GITHUB_ENV
+          echo "next-oc-version=1.0.0" >> $GITHUB_ENV
+          echo "next-sim-version=1.0.0" >> $GITHUB_ENV
 
     outputs:
       current-core-version: ${{ env.current-core-version }}
@@ -130,6 +130,11 @@ jobs:
           echo ${{ needs.setup.outputs.current-dp-version }}
           echo ${{ needs.setup.outputs.current-oc-version }}
           echo ${{ needs.setup.outputs.current-sim-version }}
+          echo ${{ needs.setup.outputs.next-core-version }}
+          echo ${{ needs.setup.outputs.next-adp-version }}
+          echo ${{ needs.setup.outputs.next-dp-version }}
+          echo ${{ needs.setup.outputs.next-oc-version }}
+          echo ${{ needs.setup.outputs.next-sim-version }}
 
       - name: set current versions.
         run: |

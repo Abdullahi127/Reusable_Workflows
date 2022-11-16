@@ -117,6 +117,14 @@ jobs:
           java-version: "17"
           cache: "gradle"
 
+      - name: check current versions.
+        run: |
+          echo ${{ needs.setup.outputs.current-core-version }}
+          echo ${{ needs.setup.outputs.current-adp-version }}
+          echo ${{ needs.setup.outputs.current-dp-version }}
+          echo ${{ needs.setup.outputs.current-oc-version }}
+          echo ${{ needs.setup.outputs.current-sim-version }}
+
       - name: set current versions.
         run: |
           chmod +x ./gradlew 

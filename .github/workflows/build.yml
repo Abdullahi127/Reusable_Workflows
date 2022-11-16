@@ -86,7 +86,13 @@ jobs:
 
       - run: echo "current-sim-version=${{ steps.current-sim-version.outputs.value }}" >> $GITHUB_ENV
 
-      #---- TODO Get next versions.
+      #---- TODO Update Get next versions.
+      - run: |
+          echo "env.next-core-version=1.0.0" >> $GITHUB_ENV
+          echo "env.next-adp-version=1.0.0" >> $GITHUB_ENV
+          echo "env.next-dp-version=1.0.0" >> $GITHUB_ENV
+          echo "env.next-oc-version=1.0.0" >> $GITHUB_ENV
+          echo "env.next-sim-version=1.0.0" >> $GITHUB_ENV
 
     outputs:
       current-core-version: ${{ env.current-core-version }}
@@ -94,11 +100,11 @@ jobs:
       current-dp-version: ${{ env.current-dp-version }}
       current-oc-version: ${{ env.current-oc-version }}
       current-sim-version: ${{ env.current-sim-version }}
-      # next-core-version: ${{ env.next-core-version }}
-      # next-adp-version: ${{ env.next-adp-version }}
-      # next-dp-version: ${{ env.next-dp-version }}
-      # next-oc-version: ${{ env.next-oc-version }}
-      # next-sim-version: ${{ env.next-sim-version }}
+      next-core-version: ${{ env.next-core-version }}
+      next-adp-version: ${{ env.next-adp-version }}
+      next-dp-version: ${{ env.next-dp-version }}
+      next-oc-version: ${{ env.next-oc-version }}
+      next-sim-version: ${{ env.next-sim-version }}
 
   build:
     needs: [setup, check-diff]

@@ -281,10 +281,11 @@ jobs:
       - run: |
           echo "versions=${{ steps.update-sim-version.outputs.map }}"
 
-      - name: commit changes
-        run: |
-          git config --global user.name "${GITHUB_ACTOR}"
-          git config --global user.email "${GITHUB_ACTOR}"
-          git add ./versions.json
-          git commit -m "Update versions"
-          git push
+    # TODO uncomment when next version is added.
+    # - name: commit changes
+    #   run: |
+    #     git config --global user.name "${GITHUB_ACTOR}"
+    #     git config --global user.email "${GITHUB_ACTOR}"
+    #     git add ./versions.json
+    #     git commit -m "Update versions"
+    #     git push

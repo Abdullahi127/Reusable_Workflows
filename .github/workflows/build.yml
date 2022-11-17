@@ -150,14 +150,26 @@ jobs:
         run: |
           chmod +x ./gradlew
           ./gradlew core:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-core-version }} --alias=core core:build
-          echo "core-build-path=./core/build/libs" >> $GITHUB_ENV
+
+      - name: upload adp
+        if: ${{ needs.check-diff.outputs.core-changed == 'true' }}
+        with:
+          name: deploy
+          path: ./core/build/libs
+          retention-days: 1
 
       - name: build adp
         if: ${{ needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         run: |
           chmod +x ./gradlew
           ./gradlew adp:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-adp-version }} --alias=adp adp:build
-          echo "adp-build-path=./adp/build/libs" >> $GITHUB_ENV
+
+      - name: upload adp
+        if: ${{ needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+        with:
+          name: deploy
+          path: ./adp/build/libs
+          retention-days: 1
 
       - name: build dp
         if: ${{ needs.check-diff.outputs.dp-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
@@ -166,36 +178,41 @@ jobs:
           ./gradlew dp:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-dp-version }} --alias=dp dp:build
           echo "dp-build-path=./dp/build/libs" >> $GITHUB_ENV
 
+      - name: upload dp
+        if: ${{ needs.check-diff.outputs.dp-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: deploy
+          path: ./dp/build/libs
+          retention-days: 1
+
       - name: build oc
         if: ${{ needs.check-diff.outputs.oc-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         run: |
           chmod +x ./gradlew
           ./gradlew oc:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-oc-version }} --alias=oc oc:build
-          echo "oc-build-path=./oc/build/libs" >> $GITHUB_ENV
+
+      - name: upload oc
+        if: ${{ needs.check-diff.outputs.oc-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: deploy
+          path: ./oc/build/libs
+          retention-days: 1
 
       - name: build sim
         if: ${{ needs.check-diff.outputs.sim-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         run: |
           chmod +x ./gradlew 
           ./gradlew sim:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-sim-version }} --alias=sim build
-          echo "sim-build-path=./sim/build/libs" >> $GITHUB_ENV
 
-      - name: copy sim jar.
-        run: |
-          regex="[0-9]\.[0-9]\.[0-9]\.jar"
-          for FILE in ${{ env.sim-build-path }}/*.jar; do
-            if [[ $FILE =~ $regex ]];
-            then
-              echo "$FILE";
-              mkdir deploy;
-              cp -r "$FILE" "${GITHUB_WORKSPACE}/deploy/"
-            else
-              echo "No match: $FILE";
-            fi  
-          done;
-          cd ./deploy
-          ls
-          cd ..
+      - name: upload sim.
+        if: ${{ needs.check-diff.outputs.sim-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: deploy
+          path: ./sim/build/libs
+          retention-days: 1
 
   version-updates:
     needs: [build, setup, check-diff]

@@ -153,6 +153,7 @@ jobs:
 
       - name: upload adp
         if: ${{ needs.check-diff.outputs.core-changed == 'true' }}
+        uses: actions/upload-artifact@v3
         with:
           name: deploy
           path: ./core/build/libs
@@ -166,6 +167,7 @@ jobs:
 
       - name: upload adp
         if: ${{ needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+        uses: actions/upload-artifact@v3
         with:
           name: deploy
           path: ./adp/build/libs

@@ -18,7 +18,12 @@ jobs:
         working-directory: path/to/artifacts
 
       - name: "Echo download path"
-        run: echo ${{steps.download.outputs.download-path}}
+        run: |
+          echo "${{ steps.download.outputs.download-path }}"
+          for FILE in ${{ steps.download.outputs.download-path }}/; do
+              echo "$FILE";
+          done;
+
 # jobs:
 #   deploy:
 #     runs-on: ubuntu-latest

@@ -40,17 +40,13 @@ jobs:
     steps:
       - name: Checkout Core
         run: |
-          echo "core-gradle=${{ core-gradle-name }}"
-          echo "core-directory=${{ core-directory-name }}"
-
-          echo "adp-gradle=${{ adp-gradle-name }}"
-          echo "adp-directory=${{ adp-directory-name }}"
-
-          echo "dp-gradle=${{ dp-gradle-name }}"
-          echo "dp-directory=${{ dp-directory-name }}"
-
-          echo "oc-gradle=${{ oc-gradle-name }}"
-          echo "oc-directory=${{ oc-directory-name }}"
-
-          echo "sim-gradle=${{ sim-gradle-name }}"
-          echo "sim-directory=${{ sim-directory-name }}"
+          echo "core-gradle=${{ inputs.core-gradle-name }}"
+          echo "core-directory=${{ inputs.core-directory-name }}"
+          echo "adp-gradle=${{ inputs.adp-gradle-name }}"
+          echo "adp-directory=${{ inputs.adp-directory-name }}"
+          echo "dp-gradle=${{ inputs.dp-gradle-name }}"
+          echo "dp-directory=${{ inputs.dp-directory-name }}"
+          echo "oc-gradle=${{ inputs.oc-gradle-name }}"
+          echo "oc-directory=${{ inputs.oc-directory-name }}"
+          echo "sim-gradle=${{ inputs.sim-gradle-name }}"
+          echo "sim-directory=${{ inputs.sim-directory-name }}"

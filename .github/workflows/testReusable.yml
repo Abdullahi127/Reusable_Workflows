@@ -1,0 +1,37 @@
+name: Test
+
+on:
+  workflow_call:
+    inputs:
+      core:
+        required: true
+        type: string
+        description: Gradle project name.
+      adp:
+        required: true
+        type: string
+        description: Gradle project name.
+      dp:
+        required: true
+        type: string
+        description: Gradle project name.
+      oc:
+        required: true
+        type: string
+        description: Gradle project name.
+      sim:
+        required: true
+        type: string
+        description: Gradle project name.
+
+jobs:
+  print:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Core
+        run: |
+          echo "core=${{ inputs.core }}}"
+          echo "adp=${{ inputs.adp }}}"
+          echo "dp=${{ inputs.dp }}}"
+          echo "oc=${{ inputs.oc }}}"
+          echo "sim=${{ inputs.sim }}}"

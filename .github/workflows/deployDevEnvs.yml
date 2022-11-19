@@ -20,8 +20,12 @@ jobs:
       - name: "Echo download path"
         run: |
           echo "${{ steps.download.outputs.download-path }}"
+          regex="[0-9]\.[0-9]\.[0-9]\.jar"
           for FILE in ${{ steps.download.outputs.download-path }}/*.jar; do
-              echo "$FILE";
+              if [[ $FILE =~ $regex ]];
+                then
+                echo "$FILE";
+              fi
           done;
 
 # jobs:

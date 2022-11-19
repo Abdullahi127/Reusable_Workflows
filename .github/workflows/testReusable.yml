@@ -3,41 +3,73 @@ name: Test
 on:
   workflow_call:
     inputs:
-      core:
+      core-gradle-name:
         required: true
         type: string
-        description: Gradle project name.
-      adp:
-        required: true
-        type: string
-        description: Gradle project name.
-      dp:
-        required: true
-        type: string
-        description: Gradle project name.
-      oc:
-        required: true
-        type: string
-        description: Gradle project name.
-      sim:
-        required: true
-        type: string
-        description: Gradle project name.
+        description: The gradle name of the project.
 
-    env:
-      GRADLE_CORE: ${{ inputs.core }}
-      GRADLE_ADP: ${{ inputs.adp }}
-      GRADLE_DP: ${{ inputs.dp }}
-      GRADLE_OC: ${{ inputs.oc }}
-      GRADLE_SIM: ${{ inputs.sim }}
+      core-directory-name:
+        required: true
+        type: string
+        description: the directory name of the project.
+
+      adp-gradle-name:
+        required: true
+        type: string
+        description: The gradle name of the project.
+
+      adp-directory-name:
+        required: true
+        type: string
+        description: the directory name of the project.
+
+      dp-gradle-name:
+        required: true
+        type: string
+        description: The gradle name of the project.
+
+      dp-directory-name:
+        required: true
+        type: string
+        description: the directory name of the project.
+
+      oc-gradle-name:
+        required: true
+        type: string
+        description: The gradle name of the project.
+
+      oc-directory-name:
+        required: true
+        type: string
+        description: the directory name of the project.
+
+      sim-gradle-name:
+        required: true
+        type: string
+        description: The gradle name of the project.
+
+      sim-directory-name:
+        required: true
+        type: string
+        description: the directory name of the project.
+
 jobs:
   print:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Core
         run: |
-          echo "core=env.GRADLE_CORE"
-          echo "adp=env.GRADLE_CORE"
-          echo "dp=env.GRADLE_CORE"
-          echo "oc=env.GRADLE_CORE"
-          echo "sim=env.GRADLE_CORE"
+          echo "core-gradle=${{ core-gradle-name }}"
+          echo "core-directory=${{ core-directory-name }}"
+
+          echo "adp-gradle=${{ adp-gradle-name }}"
+          echo "adp-directory=${{ adp-directory-name }}"
+
+          echo "dp-gradle=${{ dp-gradle-name }}"
+          echo "dp-directory=${{ dp-directory-name }}"
+
+          echo "oc-gradle=${{ oc-gradle-name }}"
+          echo "oc-directory=${{ oc-directory-name }}"
+
+          echo "sim-gradle=${{ sim-gradle-name }}"
+          echo "sim-directory=${{ sim-directory-name }}"

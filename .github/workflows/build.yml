@@ -3,26 +3,45 @@ name: Build
 on:
   workflow_call:
     inputs:
-      core:
+      core-gradle-name:
         required: true
         type: string
-        description: Gradle project name.
-      adp:
+
+      core-directory-name:
         required: true
         type: string
-        description: Gradle project name.
-      dp:
+
+      adp-gradle-name:
         required: true
         type: string
-        description: Gradle project name.
-      oc:
+
+      adp-directory-name:
         required: true
         type: string
-        description: Gradle project name.
-      sim:
+
+      dp-gradle-name:
         required: true
         type: string
-        description: Gradle project name.
+
+      dp-directory-name:
+        required: true
+        type: string
+
+      oc-gradle-name:
+        required: true
+        type: string
+
+      oc-directory-name:
+        required: true
+        type: string
+
+      sim-gradle-name:
+        required: true
+        type: string
+
+      sim-directory-name:
+        required: true
+        type: string
 
 jobs:
   check-diff:
@@ -35,19 +54,19 @@ jobs:
           fetch-depth: 0
 
       - name: check core.
-        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} core/ && (echo "core-changed=false" >> $GITHUB_ENV ) || (echo "core-changed=true" >> $GITHUB_ENV)
+        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ core-directory-name }}/ && (echo "core-changed=false" >> $GITHUB_ENV ) || (echo "core-changed=true" >> $GITHUB_ENV)
 
       - name: check adp.
-        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} adp/ && (echo "adp-changed=false" >> $GITHUB_ENV ) || (echo "adp-changed=true" >> $GITHUB_ENV)
+        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ adp-directory-name }}/ && (echo "adp-changed=false" >> $GITHUB_ENV ) || (echo "adp-changed=true" >> $GITHUB_ENV)
 
       - name: check dp.
-        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} dp/ && (echo "dp-changed=false" >> $GITHUB_ENV ) || (echo "dp-changed=true" >> $GITHUB_ENV)
+        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ dp-directory-name }}/ && (echo "dp-changed=false" >> $GITHUB_ENV ) || (echo "dp-changed=true" >> $GITHUB_ENV)
 
       - name: check oc.
-        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} oc/ && (echo "oc-changed=false" >> $GITHUB_ENV ) || (echo "oc-changed=true" >> $GITHUB_ENV)
+        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ oc-directory-name }}/ && (echo "oc-changed=false" >> $GITHUB_ENV ) || (echo "oc-changed=true" >> $GITHUB_ENV)
 
       - name: check sim.
-        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} sim/ && (echo "sim-changed=false" >> $GITHUB_ENV ) || (echo "sim-changed=true" >> $GITHUB_ENV)
+        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ sim-directory-name }}/ && (echo "sim-changed=false" >> $GITHUB_ENV ) || (echo "sim-changed=true" >> $GITHUB_ENV)
 
     outputs:
       core-changed: ${{ env.core-changed }}
@@ -160,81 +179,80 @@ jobs:
       - name: set current versions.
         run: |
           chmod +x ./gradlew 
-          ./gradlew core:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-core-version }} --alias=core 
-          ./gradlew adp:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-adp-version }} --alias=adp 
-          ./gradlew dp:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-dp-version }} --alias=dp 
-          ./gradlew oc:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-oc-version }} --alias=oc 
-          ./gradlew sim:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-sim-version }} --alias=sim
+          ./gradlew ${{ inputs.core-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-core-version }} --alias=core 
+          ./gradlew ${{ inputs.adp-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-adp-version }} --alias=adp 
+          ./gradlew ${{ inputs.dp-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-dp-version }} --alias=dp 
+          ./gradlew ${{ inputs.oc-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-oc-version }} --alias=oc 
+          ./gradlew ${{ inputs.sim-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-sim-version }} --alias=sim
 
       - name: build core
         if: ${{ needs.check-diff.outputs.core-changed == 'true' }}
         run: |
           chmod +x ./gradlew
-          ./gradlew core:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-core-version }} --alias=core core:build
+          ./gradlew ${{ inputs.core-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-core-version }} --alias=core ${{ inputs.core-gradle-name }}:build
 
       - name: upload adp
         if: ${{ needs.check-diff.outputs.core-changed == 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: deploy
-          path: ./core/build/libs
+          path: ./${{ core-directory-name }}/build/libs
           retention-days: 1
 
       - name: build adp
         if: ${{ needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         run: |
           chmod +x ./gradlew
-          ./gradlew adp:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-adp-version }} --alias=adp adp:build
+          ./gradlew ${{ inputs.adp-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-adp-version }} --alias=adp ${{ inputs.adp-gradle-name }}:build
 
       - name: upload adp
         if: ${{ needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: deploy
-          path: ./adp/build/libs
+          path: ./${{ adp-directory-name }}/build/libs
           retention-days: 1
 
       - name: build dp
         if: ${{ needs.check-diff.outputs.dp-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         run: |
           chmod +x ./gradlew 
-          ./gradlew dp:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-dp-version }} --alias=dp dp:build
-          echo "dp-build-path=./dp/build/libs" >> $GITHUB_ENV
+          ./gradlew ${{ inputs.dp-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-dp-version }} --alias=dp ${{ inputs.dp-gradle-name }}:build
 
       - name: upload dp
         if: ${{ needs.check-diff.outputs.dp-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: deploy
-          path: ./dp/build/libs
+          path: ./${{ dp-directory-name }}/build/libs
           retention-days: 1
 
       - name: build oc
         if: ${{ needs.check-diff.outputs.oc-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         run: |
           chmod +x ./gradlew
-          ./gradlew oc:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-oc-version }} --alias=oc oc:build
+          ./gradlew ${{ inputs.oc-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-oc-version }} --alias=oc ${{ inputs.oc-gradle-name }}:build
 
       - name: upload oc
         if: ${{ needs.check-diff.outputs.oc-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: deploy
-          path: ./oc/build/libs
+          path: ./${{ oc-directory-name }}/build/libs
           retention-days: 1
 
       - name: build sim
         if: ${{ needs.check-diff.outputs.sim-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         run: |
           chmod +x ./gradlew 
-          ./gradlew sim:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-sim-version }} --alias=sim build
+          ./gradlew ${{ inputs.sim-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-sim-version }} --alias=sim build
 
       - name: upload sim.
         if: ${{ needs.check-diff.outputs.sim-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: deploy
-          path: ./sim/build/libs
+          path: ./${{ sim-directory-name }}/build/libs
           retention-days: 1
 
   version-updates:

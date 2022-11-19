@@ -24,14 +24,20 @@ on:
         type: string
         description: Gradle project name.
 
+    env:
+      GRADLE_CORE: ${{ inputs.core }}
+      GRADLE_ADP: ${{ inputs.adp }}
+      GRADLE_DP: ${{ inputs.dp }}
+      GRADLE_OC: ${{ inputs.oc }}
+      GRADLE_SIM: ${{ inputs.sim }}
 jobs:
   print:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Core
         run: |
-          echo "core=${{ inputs.core }}}"
-          echo "adp=${{ inputs.adp }}}"
-          echo "dp=${{ inputs.dp }}}"
-          echo "oc=${{ inputs.oc }}}"
-          echo "sim=${{ inputs.sim }}}"
+          echo "core=env.GRADLE_CORE"
+          echo "adp=env.GRADLE_CORE"
+          echo "dp=env.GRADLE_CORE"
+          echo "oc=env.GRADLE_CORE"
+          echo "sim=env.GRADLE_CORE"

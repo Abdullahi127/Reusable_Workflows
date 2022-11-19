@@ -2,6 +2,27 @@ name: Build
 
 on:
   workflow_call:
+    inputs:
+      core:
+        required: true
+        type: string
+        description: Gradle project name.
+      adp:
+        required: true
+        type: string
+        description: Gradle project name.
+      dp:
+        required: true
+        type: string
+        description: Gradle project name.
+      oc:
+        required: true
+        type: string
+        description: Gradle project name.
+      sim:
+        required: true
+        type: string
+        description: Gradle project name.
 
 jobs:
   check-diff:

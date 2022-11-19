@@ -54,19 +54,19 @@ jobs:
           fetch-depth: 0
 
       - name: check core.
-        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ core-directory-name }}/ && (echo "core-changed=false" >> $GITHUB_ENV ) || (echo "core-changed=true" >> $GITHUB_ENV)
+        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ inputs.core-directory-name }}/ && (echo "core-changed=false" >> $GITHUB_ENV ) || (echo "core-changed=true" >> $GITHUB_ENV)
 
       - name: check adp.
-        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ adp-directory-name }}/ && (echo "adp-changed=false" >> $GITHUB_ENV ) || (echo "adp-changed=true" >> $GITHUB_ENV)
+        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ inputs.adp-directory-name }}/ && (echo "adp-changed=false" >> $GITHUB_ENV ) || (echo "adp-changed=true" >> $GITHUB_ENV)
 
       - name: check dp.
-        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ dp-directory-name }}/ && (echo "dp-changed=false" >> $GITHUB_ENV ) || (echo "dp-changed=true" >> $GITHUB_ENV)
+        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ inputs.dp-directory-name }}/ && (echo "dp-changed=false" >> $GITHUB_ENV ) || (echo "dp-changed=true" >> $GITHUB_ENV)
 
       - name: check oc.
-        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ oc-directory-name }}/ && (echo "oc-changed=false" >> $GITHUB_ENV ) || (echo "oc-changed=true" >> $GITHUB_ENV)
+        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ inputs.oc-directory-name }}/ && (echo "oc-changed=false" >> $GITHUB_ENV ) || (echo "oc-changed=true" >> $GITHUB_ENV)
 
       - name: check sim.
-        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ sim-directory-name }}/ && (echo "sim-changed=false" >> $GITHUB_ENV ) || (echo "sim-changed=true" >> $GITHUB_ENV)
+        run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ inputs.sim-directory-name }}/ && (echo "sim-changed=false" >> $GITHUB_ENV ) || (echo "sim-changed=true" >> $GITHUB_ENV)
 
     outputs:
       core-changed: ${{ env.core-changed }}
@@ -196,7 +196,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: deploy
-          path: ./${{ core-directory-name }}/build/libs
+          path: ./${{ inputs.core-directory-name }}/build/libs
           retention-days: 1
 
       - name: build adp
@@ -210,7 +210,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: deploy
-          path: ./${{ adp-directory-name }}/build/libs
+          path: ./${{ inputs.adp-directory-name }}/build/libs
           retention-days: 1
 
       - name: build dp
@@ -224,7 +224,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: deploy
-          path: ./${{ dp-directory-name }}/build/libs
+          path: ./${{ inputs.dp-directory-name }}/build/libs
           retention-days: 1
 
       - name: build oc
@@ -238,7 +238,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: deploy
-          path: ./${{ oc-directory-name }}/build/libs
+          path: ./${{ inputs.oc-directory-name }}/build/libs
           retention-days: 1
 
       - name: build sim
@@ -252,7 +252,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: deploy
-          path: ./${{ sim-directory-name }}/build/libs
+          path: ./${{ inputs.sim-directory-name }}/build/libs
           retention-days: 1
 
   version-updates:

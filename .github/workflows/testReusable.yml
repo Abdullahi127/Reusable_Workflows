@@ -6,52 +6,33 @@ on:
       core-gradle-name:
         required: true
         type: string
-        description: The gradle name of the project.
-
       core-directory-name:
         required: true
         type: string
-        description: the directory name of the project.
-
       adp-gradle-name:
         required: true
         type: string
-        description: The gradle name of the project.
-
       adp-directory-name:
         required: true
         type: string
-        description: the directory name of the project.
-
       dp-gradle-name:
         required: true
         type: string
-        description: The gradle name of the project.
-
       dp-directory-name:
         required: true
         type: string
-        description: the directory name of the project.
-
       oc-gradle-name:
         required: true
         type: string
-        description: The gradle name of the project.
-
       oc-directory-name:
         required: true
         type: string
-        description: the directory name of the project.
-
       sim-gradle-name:
         required: true
         type: string
-        description: The gradle name of the project.
-
       sim-directory-name:
         required: true
         type: string
-        description: the directory name of the project.
 
 jobs:
   print:

@@ -6,67 +6,85 @@ on:
       core-gradle-name:
         required: true
         type: string
+        description: The gradle project name.
 
       core-directory-name:
         required: true
         type: string
+        description: The project directory name.
 
       adp-gradle-name:
         required: true
         type: string
+        description: The gradle project name.
 
       adp-directory-name:
         required: true
         type: string
+        description: The project directory name.
 
       dp-gradle-name:
         required: true
         type: string
+        description: The gradle project name.
 
       dp-directory-name:
         required: true
         type: string
+        description: The project directory name.
 
       oc-gradle-name:
         required: true
         type: string
+        description: The gradle project name.
 
       oc-directory-name:
         required: true
         type: string
+        description: The project directory name.
 
       sim-gradle-name:
         required: true
         type: string
+        description: The gradle project name.
 
       sim-directory-name:
         required: true
         type: string
+        description: The project directory name.
 
 jobs:
   check-diff:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout dev branch.
+      - name: Checkout.
         uses: actions/checkout@v3
         with:
           ref: dev
           fetch-depth: 0
 
-      - name: check core.
+      - id: check-core
         run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ inputs.core-directory-name }}/ && (echo "core-changed=false" >> $GITHUB_ENV ) || (echo "core-changed=true" >> $GITHUB_ENV)
 
-      - name: check adp.
+      - id: check-adp
         run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ inputs.adp-directory-name }}/ && (echo "adp-changed=false" >> $GITHUB_ENV ) || (echo "adp-changed=true" >> $GITHUB_ENV)
 
-      - name: check dp.
+      - id: check-dp
         run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ inputs.dp-directory-name }}/ && (echo "dp-changed=false" >> $GITHUB_ENV ) || (echo "dp-changed=true" >> $GITHUB_ENV)
 
-      - name: check oc.
+      - id: check-oc
         run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ inputs.oc-directory-name }}/ && (echo "oc-changed=false" >> $GITHUB_ENV ) || (echo "oc-changed=true" >> $GITHUB_ENV)
 
-      - name: check sim.
+      - id: check-sim
         run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ inputs.sim-directory-name }}/ && (echo "sim-changed=false" >> $GITHUB_ENV ) || (echo "sim-changed=true" >> $GITHUB_ENV)
+
+      - name: check diff result.
+        run: |
+          echo "core-changed=${{ env.core-changed }}"
+          echo "adp-changed=${{ env.adp-changed }}"
+          echo "dp-changed=${{ env.dp-changed }}"
+          echo "oc-changed=${{ env.oc-changed }}"
+          echo "sim-changed=${{ env.sim-changed }}"
 
     outputs:
       core-changed: ${{ env.core-changed }}
@@ -85,54 +103,111 @@ jobs:
           ref: version
           fetch-depth: 0
 
-      #---- Get current versions.
-      - uses: Abdullahi127/Custom_Actions/.github/actions/jsonReader@main
+      #--- Get current versions.
+
+      - uses: tkrgs/thunderkick-actions/findprojectversion@main
         id: current-core-version
         with:
-          path: "./versions.json"
-          key: "core"
+          path: ./versions.json
+          key: core
 
       - run: echo "current-core-version=${{ steps.current-core-version.outputs.value }}" >> $GITHUB_ENV
 
-      - uses: Abdullahi127/Custom_Actions/.github/actions/jsonReader@main
+      - uses: tkrgs/thunderkick-actions/findprojectversion@main
         id: current-adp-version
         with:
-          path: "./versions.json"
-          key: "adp"
+          path: ./versions.json
+          key: adp
 
       - run: echo "current-adp-version=${{ steps.current-adp-version.outputs.value }}" >> $GITHUB_ENV
 
-      - uses: Abdullahi127/Custom_Actions/.github/actions/jsonReader@main
+      - uses: tkrgs/thunderkick-actions/findprojectversion@main
         id: current-dp-version
         with:
-          path: "./versions.json"
-          key: "dp"
+          path: ./versions.json
+          key: dp
 
       - run: echo "current-dp-version=${{ steps.current-dp-version.outputs.value }}" >> $GITHUB_ENV
 
-      - uses: Abdullahi127/Custom_Actions/.github/actions/jsonReader@main
+      - uses: tkrgs/thunderkick-actions/findprojectversion@main
         id: current-oc-version
         with:
-          path: "./versions.json"
-          key: "oc"
+          path: ./versions.json
+          key: oc
 
       - run: echo "current-oc-version=${{ steps.current-oc-version.outputs.value }}" >> $GITHUB_ENV
 
-      - uses: Abdullahi127/Custom_Actions/.github/actions/jsonReader@main
+      - uses: tkrgs/thunderkick-actions/findprojectversion@main
         id: current-sim-version
         with:
-          path: "./versions.json"
-          key: "sim"
+          path: ./versions.json
+          key: sim
 
       - run: echo "current-sim-version=${{ steps.current-sim-version.outputs.value }}" >> $GITHUB_ENV
 
-      #---- TODO Update Get next versions.
-      - run: |
-          echo "next-core-version=1.0.0" >> $GITHUB_ENV
-          echo "next-adp-version=1.0.0" >> $GITHUB_ENV
-          echo "next-dp-version=1.0.0" >> $GITHUB_ENV
-          echo "next-oc-version=1.0.0" >> $GITHUB_ENV
-          echo "next-sim-version=1.0.0" >> $GITHUB_ENV
+      #--- Get next versions.
+
+      - name: get-commits
+        run: |
+          echo "commits=$(git log --oneline ${{ github.event.before }}...${{ github.event.after }} | tr '\n' ' ')" >> $GITHUB_ENV
+
+      - uses: tkrgs/thunderkick-actions/findnextversion@main
+        id: core-next-version
+        if: ${{ needs.check-diff.outputs.core-changed == 'true' }}
+        with:
+          projectName: "core"
+          currentVersion: ${{ env.current-core-version }}
+          commits: ${{ env.commits }}
+
+      - run: echo "next-core-version=${{ steps.core-next-version.outputs.nextVersion }}" >> $GITHUB_ENV
+
+      - uses: tkrgs/thunderkick-actions/findnextversion@main
+        id: adp-next-version
+        if: ${{ needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+        with:
+          projectName: "adp"
+          currentVersion: ${{ env.current-adp-version }}
+          commits: ${{ env.commits }}
+
+      - run: echo "next-adp-version=${{ steps.adp-next-version.outputs.nextVersion }}" >> $GITHUB_ENV
+
+      - uses: tkrgs/thunderkick-actions/findnextversion@main
+        id: dp-next-version
+        if: ${{ needs.check-diff.outputs.dp-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+        with:
+          projectName: "dp"
+          currentVersion: ${{ env.current-dp-version }}
+          commits: ${{ env.commits }}
+
+      - run: echo "next-dp-version=${{ steps.dp-next-version.outputs.nextVersion }}" >> $GITHUB_ENV
+
+      - uses: tkrgs/thunderkick-actions/findnextversion@main
+        id: oc-next-version
+        if: ${{ needs.check-diff.outputs.oc-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+        with:
+          projectName: "oc"
+          currentVersion: ${{ env.current-oc-version }}
+          commits: ${{ env.commits }}
+
+      - run: echo "next-oc-version=${{ steps.oc-next-version.outputs.nextVersion }}" >> $GITHUB_ENV
+
+      - uses: tkrgs/thunderkick-actions/findnextversion@main
+        id: sim-next-version
+        if: ${{ needs.check-diff.outputs.sim-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+        with:
+          projectName: "sim"
+          currentVersion: ${{ env.current-sim-version }}
+          commits: ${{ env.commits }}
+
+      - run: echo "next-sim-version=${{ steps.sim-next-version.outputs.nextVersion }}" >> $GITHUB_ENV
+
+      - name: check next versions.
+        run: |
+          echo "core=${{ env.next-core-version }}"
+          echo "adp=${{ env.next-adp-version }}"
+          echo "dp=${{ env.next-dp-version }}"
+          echo "oc=${{ env.next-oc-version }}"
+          echo "sim=${{ env.next-sim-version }}"
 
     outputs:
       current-core-version: ${{ env.current-core-version }}
@@ -146,9 +221,14 @@ jobs:
       next-oc-version: ${{ env.next-oc-version }}
       next-sim-version: ${{ env.next-sim-version }}
 
-  build:
+  publish:
     needs: [setup, check-diff]
     runs-on: ubuntu-latest
+    env:
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+      ARTIFACTORY_URL: ${{secrets.TK_MAVEN_URL}}
+      ARTIFACTORY_AUTH_TOKEN: ${{secrets.TK_PUSH_TOKEN}}
+
     steps:
       - name: checkout dev repo
         uses: actions/checkout@v3
@@ -163,35 +243,26 @@ jobs:
           java-version: "17"
           cache: "gradle"
 
-      - name: check current versions.
-        run: |
-          echo ${{ needs.setup.outputs.current-core-version }}
-          echo ${{ needs.setup.outputs.current-adp-version }}
-          echo ${{ needs.setup.outputs.current-dp-version }}
-          echo ${{ needs.setup.outputs.current-oc-version }}
-          echo ${{ needs.setup.outputs.current-sim-version }}
-          echo ${{ needs.setup.outputs.next-core-version }}
-          echo ${{ needs.setup.outputs.next-adp-version }}
-          echo ${{ needs.setup.outputs.next-dp-version }}
-          echo ${{ needs.setup.outputs.next-oc-version }}
-          echo ${{ needs.setup.outputs.next-sim-version }}
+      - name: Setup gradle.
+        uses: tkrgs/setup-gradle-publish@main
 
       - name: set current versions.
         run: |
           chmod +x ./gradlew 
-          ./gradlew ${{ inputs.core-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-core-version }} --alias=core 
+          ./gradlew ${{ inputs.core-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-core-version }} --alias=core  
           ./gradlew ${{ inputs.adp-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-adp-version }} --alias=adp 
           ./gradlew ${{ inputs.dp-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-dp-version }} --alias=dp 
           ./gradlew ${{ inputs.oc-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-oc-version }} --alias=oc 
           ./gradlew ${{ inputs.sim-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-sim-version }} --alias=sim
 
-      - name: build core
+      - name: build and publish core
         if: ${{ needs.check-diff.outputs.core-changed == 'true' }}
         run: |
-          chmod +x ./gradlew
-          ./gradlew ${{ inputs.core-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-core-version }} --alias=core ${{ inputs.core-gradle-name }}:build
+          chmod +x ./gradlew 
+          ./gradlew ${{ inputs.core-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-core-version }} --alias=core 
+          ./gradlew ${{ inputs.core-gradle-name }}:buildNPublish
 
-      - name: upload adp
+      - name: upload core
         if: ${{ needs.check-diff.outputs.core-changed == 'true' }}
         uses: actions/upload-artifact@v3
         with:
@@ -199,11 +270,12 @@ jobs:
           path: ./${{ inputs.core-directory-name }}/build/libs
           retention-days: 1
 
-      - name: build adp
+      - name: build and publish adp
         if: ${{ needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         run: |
-          chmod +x ./gradlew
-          ./gradlew ${{ inputs.adp-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-adp-version }} --alias=adp ${{ inputs.adp-gradle-name }}:build
+          chmod +x ./gradlew 
+          ./gradlew ${{ inputs.adp-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-adp-version }} --alias=adp
+          ./gradlew ${{ inputs.adp-gradle-name }}:buildNPublish
 
       - name: upload adp
         if: ${{ needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
@@ -213,11 +285,12 @@ jobs:
           path: ./${{ inputs.adp-directory-name }}/build/libs
           retention-days: 1
 
-      - name: build dp
-        if: ${{ needs.check-diff.outputs.dp-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+      - name: build and publish dp
+        if: ${{ needs.check-diff.outputs.dp-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' ||  needs.check-diff.outputs.core-changed == 'true' }}
         run: |
           chmod +x ./gradlew 
-          ./gradlew ${{ inputs.dp-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-dp-version }} --alias=dp ${{ inputs.dp-gradle-name }}:build
+          ./gradlew  ${{ inputs.dp-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-dp-version }} --alias=dp
+          ./gradlew  ${{ inputs.dp-gradle-name }}:buildNPublish
 
       - name: upload dp
         if: ${{ needs.check-diff.outputs.dp-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
@@ -227,11 +300,12 @@ jobs:
           path: ./${{ inputs.dp-directory-name }}/build/libs
           retention-days: 1
 
-      - name: build oc
-        if: ${{ needs.check-diff.outputs.oc-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+      - name: build and publish oc
+        if: ${{ needs.check-diff.outputs.oc-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' ||  needs.check-diff.outputs.core-changed == 'true' }}
         run: |
           chmod +x ./gradlew
-          ./gradlew ${{ inputs.oc-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-oc-version }} --alias=oc ${{ inputs.oc-gradle-name }}:build
+          ./gradlew ${{ inputs.oc-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-oc-version }} --alias=oc 
+          ./gradlew ${{ inputs.oc-gradle-name }}:buildNPublish
 
       - name: upload oc
         if: ${{ needs.check-diff.outputs.oc-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
@@ -241,22 +315,24 @@ jobs:
           path: ./${{ inputs.oc-directory-name }}/build/libs
           retention-days: 1
 
-      - name: build sim
-        if: ${{ needs.check-diff.outputs.sim-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+      - name: build and publish sim
+        if: ${{ needs.check-diff.outputs.sim-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' ||  needs.check-diff.outputs.core-changed == 'true' }}
         run: |
           chmod +x ./gradlew 
-          ./gradlew ${{ inputs.sim-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-sim-version }} --alias=sim build
+          ./gradlew ${{ inputs.sim-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-sim-version }} --alias=sim 
+          ./gradlew ${{ inputs.sim-gradle-name }}:buildNPublish
 
-      - name: upload sim.
-        if: ${{ needs.check-diff.outputs.sim-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: deploy
-          path: ./${{ inputs.sim-directory-name }}/build/libs
-          retention-days: 1
+  # Simulation is not needed to be deployed.
+  # - name: upload sim.
+  #   if: ${{ needs.check-diff.outputs.sim-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+  #   uses: actions/upload-artifact@v3
+  #   with:
+  #     name: deploy
+  #     path: ./${{ inputs.sim-directory-name }}/build/libs
+  #     retention-days: 1
 
-  version-updates:
-    needs: [build, setup, check-diff]
+  versions-update:
+    needs: [publish, setup, check-diff]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout version repo.
@@ -265,18 +341,18 @@ jobs:
           ref: version
           fetch-depth: 0
 
-      - uses: Abdullahi127/Custom_Actions/.github/actions/jsonWriter@main
+      - uses: tkrgs/thunderkick-actions/setprojectversion@main
         id: update-core-version
         if: ${{ needs.check-diff.outputs.core-changed == 'true' }}
         with:
-          path: "./versions.json"
-          key: "core"
-          value: "1.0.0"
+          path: ./versions.json
+          key: core
+          value: ${{ needs.setup.outputs.next-core-version }}
 
       - run: |
           echo "versions=${{ steps.update-core-version.outputs.map }}"
 
-      - uses: Abdullahi127/Custom_Actions/.github/actions/jsonWriter@main
+      - uses: tkrgs/thunderkick-actions/setprojectversion@main
         id: update-adp-version
         if: ${{ needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         with:
@@ -287,7 +363,7 @@ jobs:
       - run: |
           echo "versions=${{ steps.update-adp-version.outputs.map }}"
 
-      - uses: Abdullahi127/Custom_Actions/.github/actions/jsonWriter@main
+      - uses: tkrgs/thunderkick-actions/setprojectversion@main
         id: update-dp-version
         if: ${{ needs.check-diff.outputs.dp-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         with:
@@ -298,7 +374,7 @@ jobs:
       - run: |
           echo "versions=${{ steps.update-dp-version.outputs.map }}"
 
-      - uses: Abdullahi127/Custom_Actions/.github/actions/jsonWriter@main
+      - uses: tkrgs/thunderkick-actions/setprojectversion@main
         id: update-oc-version
         if: ${{ needs.check-diff.outputs.oc-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         with:
@@ -309,7 +385,7 @@ jobs:
       - run: |
           echo "versions=${{ steps.update-oc-version.outputs.map }}"
 
-      - uses: Abdullahi127/Custom_Actions/.github/actions/jsonWriter@main
+      - uses: tkrgs/thunderkick-actions/setprojectversion@main
         id: update-sim-version
         if: ${{ needs.check-diff.outputs.sim-changed == 'true' ||  needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         with:
@@ -320,11 +396,341 @@ jobs:
       - run: |
           echo "versions=${{ steps.update-sim-version.outputs.map }}"
 
-    # TODO uncomment when next version is added.
-    # - name: commit changes
-    #   run: |
-    #     git config --global user.name "${GITHUB_ACTOR}"
-    #     git config --global user.email "${GITHUB_ACTOR}"
-    #     git add ./versions.json
-    #     git commit -m "Update versions"
-    #     git push
+      - name: commit changes
+        run: |
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR}"
+          git add ./versions.json
+          git commit -m "Update versions"
+          git push
+
+# name: Build
+
+# on:
+#   workflow_call:
+#     inputs:
+#       core-gradle-name:
+#         required: true
+#         type: string
+
+#       core-directory-name:
+#         required: true
+#         type: string
+
+#       adp-gradle-name:
+#         required: true
+#         type: string
+
+#       adp-directory-name:
+#         required: true
+#         type: string
+
+#       dp-gradle-name:
+#         required: true
+#         type: string
+
+#       dp-directory-name:
+#         required: true
+#         type: string
+
+#       oc-gradle-name:
+#         required: true
+#         type: string
+
+#       oc-directory-name:
+#         required: true
+#         type: string
+
+#       sim-gradle-name:
+#         required: true
+#         type: string
+
+#       sim-directory-name:
+#         required: true
+#         type: string
+
+# jobs:
+#   check-diff:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: checkout dev branch.
+#         uses: actions/checkout@v3
+#         with:
+#           ref: dev
+#           fetch-depth: 0
+
+#       - name: check core.
+#         run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ inputs.core-directory-name }}/ && (echo "core-changed=false" >> $GITHUB_ENV ) || (echo "core-changed=true" >> $GITHUB_ENV)
+
+#       - name: check adp.
+#         run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ inputs.adp-directory-name }}/ && (echo "adp-changed=false" >> $GITHUB_ENV ) || (echo "adp-changed=true" >> $GITHUB_ENV)
+
+#       - name: check dp.
+#         run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ inputs.dp-directory-name }}/ && (echo "dp-changed=false" >> $GITHUB_ENV ) || (echo "dp-changed=true" >> $GITHUB_ENV)
+
+#       - name: check oc.
+#         run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ inputs.oc-directory-name }}/ && (echo "oc-changed=false" >> $GITHUB_ENV ) || (echo "oc-changed=true" >> $GITHUB_ENV)
+
+#       - name: check sim.
+#         run: git diff --quiet ${{github.event.before}} ${{github.event.after}} ${{ inputs.sim-directory-name }}/ && (echo "sim-changed=false" >> $GITHUB_ENV ) || (echo "sim-changed=true" >> $GITHUB_ENV)
+
+#     outputs:
+#       core-changed: ${{ env.core-changed }}
+#       adp-changed: ${{ env.adp-changed }}
+#       dp-changed: ${{ env.dp-changed }}
+#       oc-changed: ${{ env.oc-changed }}
+#       sim-changed: ${{ env.sim-changed }}
+
+#   setup:
+#     needs: [check-diff]
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: checkout version repo
+#         uses: actions/checkout@v3
+#         with:
+#           ref: version
+#           fetch-depth: 0
+
+#       #---- Get current versions.
+#       - uses: Abdullahi127/Custom_Actions/.github/actions/jsonReader@main
+#         id: current-core-version
+#         with:
+#           path: "./versions.json"
+#           key: "core"
+
+#       - run: echo "current-core-version=${{ steps.current-core-version.outputs.value }}" >> $GITHUB_ENV
+
+#       - uses: Abdullahi127/Custom_Actions/.github/actions/jsonReader@main
+#         id: current-adp-version
+#         with:
+#           path: "./versions.json"
+#           key: "adp"
+
+#       - run: echo "current-adp-version=${{ steps.current-adp-version.outputs.value }}" >> $GITHUB_ENV
+
+#       - uses: Abdullahi127/Custom_Actions/.github/actions/jsonReader@main
+#         id: current-dp-version
+#         with:
+#           path: "./versions.json"
+#           key: "dp"
+
+#       - run: echo "current-dp-version=${{ steps.current-dp-version.outputs.value }}" >> $GITHUB_ENV
+
+#       - uses: Abdullahi127/Custom_Actions/.github/actions/jsonReader@main
+#         id: current-oc-version
+#         with:
+#           path: "./versions.json"
+#           key: "oc"
+
+#       - run: echo "current-oc-version=${{ steps.current-oc-version.outputs.value }}" >> $GITHUB_ENV
+
+#       - uses: Abdullahi127/Custom_Actions/.github/actions/jsonReader@main
+#         id: current-sim-version
+#         with:
+#           path: "./versions.json"
+#           key: "sim"
+
+#       - run: echo "current-sim-version=${{ steps.current-sim-version.outputs.value }}" >> $GITHUB_ENV
+
+#       #---- TODO Update Get next versions.
+#       - run: |
+#           echo "next-core-version=1.0.0" >> $GITHUB_ENV
+#           echo "next-adp-version=1.0.0" >> $GITHUB_ENV
+#           echo "next-dp-version=1.0.0" >> $GITHUB_ENV
+#           echo "next-oc-version=1.0.0" >> $GITHUB_ENV
+#           echo "next-sim-version=1.0.0" >> $GITHUB_ENV
+
+#     outputs:
+#       current-core-version: ${{ env.current-core-version }}
+#       current-adp-version: ${{ env.current-adp-version }}
+#       current-dp-version: ${{ env.current-dp-version }}
+#       current-oc-version: ${{ env.current-oc-version }}
+#       current-sim-version: ${{ env.current-sim-version }}
+#       next-core-version: ${{ env.next-core-version }}
+#       next-adp-version: ${{ env.next-adp-version }}
+#       next-dp-version: ${{ env.next-dp-version }}
+#       next-oc-version: ${{ env.next-oc-version }}
+#       next-sim-version: ${{ env.next-sim-version }}
+
+#   build:
+#     needs: [setup, check-diff]
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: checkout dev repo
+#         uses: actions/checkout@v3
+#         with:
+#           ref: dev
+#           fetch-depth: 0
+
+#       - name: Setup java
+#         uses: actions/setup-java@v3
+#         with:
+#           distribution: "temurin"
+#           java-version: "17"
+#           cache: "gradle"
+
+#       - name: check current versions.
+#         run: |
+#           echo ${{ needs.setup.outputs.current-core-version }}
+#           echo ${{ needs.setup.outputs.current-adp-version }}
+#           echo ${{ needs.setup.outputs.current-dp-version }}
+#           echo ${{ needs.setup.outputs.current-oc-version }}
+#           echo ${{ needs.setup.outputs.current-sim-version }}
+#           echo ${{ needs.setup.outputs.next-core-version }}
+#           echo ${{ needs.setup.outputs.next-adp-version }}
+#           echo ${{ needs.setup.outputs.next-dp-version }}
+#           echo ${{ needs.setup.outputs.next-oc-version }}
+#           echo ${{ needs.setup.outputs.next-sim-version }}
+
+#       - name: set current versions.
+#         run: |
+#           chmod +x ./gradlew
+#           ./gradlew ${{ inputs.core-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-core-version }} --alias=core
+#           ./gradlew ${{ inputs.adp-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-adp-version }} --alias=adp
+#           ./gradlew ${{ inputs.dp-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-dp-version }} --alias=dp
+#           ./gradlew ${{ inputs.oc-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-oc-version }} --alias=oc
+#           ./gradlew ${{ inputs.sim-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-sim-version }} --alias=sim
+
+#       - name: build core
+#         if: ${{ needs.check-diff.outputs.core-changed == 'true' }}
+#         run: |
+#           chmod +x ./gradlew
+#           ./gradlew ${{ inputs.core-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-core-version }} --alias=core ${{ inputs.core-gradle-name }}:build
+
+#       - name: upload adp
+#         if: ${{ needs.check-diff.outputs.core-changed == 'true' }}
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: deploy
+#           path: ./${{ inputs.core-directory-name }}/build/libs
+#           retention-days: 1
+
+#       - name: build adp
+#         if: ${{ needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+#         run: |
+#           chmod +x ./gradlew
+#           ./gradlew ${{ inputs.adp-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-adp-version }} --alias=adp ${{ inputs.adp-gradle-name }}:build
+
+#       - name: upload adp
+#         if: ${{ needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: deploy
+#           path: ./${{ inputs.adp-directory-name }}/build/libs
+#           retention-days: 1
+
+#       - name: build dp
+#         if: ${{ needs.check-diff.outputs.dp-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+#         run: |
+#           chmod +x ./gradlew
+#           ./gradlew ${{ inputs.dp-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-dp-version }} --alias=dp ${{ inputs.dp-gradle-name }}:build
+
+#       - name: upload dp
+#         if: ${{ needs.check-diff.outputs.dp-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: deploy
+#           path: ./${{ inputs.dp-directory-name }}/build/libs
+#           retention-days: 1
+
+#       - name: build oc
+#         if: ${{ needs.check-diff.outputs.oc-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+#         run: |
+#           chmod +x ./gradlew
+#           ./gradlew ${{ inputs.oc-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-oc-version }} --alias=oc ${{ inputs.oc-gradle-name }}:build
+
+#       - name: upload oc
+#         if: ${{ needs.check-diff.outputs.oc-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: deploy
+#           path: ./${{ inputs.oc-directory-name }}/build/libs
+#           retention-days: 1
+
+#       - name: build sim
+#         if: ${{ needs.check-diff.outputs.sim-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+#         run: |
+#           chmod +x ./gradlew
+#           ./gradlew ${{ inputs.sim-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-sim-version }} --alias=sim build
+
+#       - name: upload sim.
+#         if: ${{ needs.check-diff.outputs.sim-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: deploy
+#           path: ./${{ inputs.sim-directory-name }}/build/libs
+#           retention-days: 1
+
+#   version-updates:
+#     needs: [build, setup, check-diff]
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout version repo.
+#         uses: actions/checkout@v3
+#         with:
+#           ref: version
+#           fetch-depth: 0
+
+#       - uses: Abdullahi127/Custom_Actions/.github/actions/jsonWriter@main
+#         id: update-core-version
+#         if: ${{ needs.check-diff.outputs.core-changed == 'true' }}
+#         with:
+#           path: "./versions.json"
+#           key: "core"
+#           value: "1.0.0"
+
+#       - run: |
+#           echo "versions=${{ steps.update-core-version.outputs.map }}"
+
+#       - uses: Abdullahi127/Custom_Actions/.github/actions/jsonWriter@main
+#         id: update-adp-version
+#         if: ${{ needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+#         with:
+#           path: ./versions.json
+#           key: adp
+#           value: ${{ needs.setup.outputs.next-adp-version }}
+
+#       - run: |
+#           echo "versions=${{ steps.update-adp-version.outputs.map }}"
+
+#       - uses: Abdullahi127/Custom_Actions/.github/actions/jsonWriter@main
+#         id: update-dp-version
+#         if: ${{ needs.check-diff.outputs.dp-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+#         with:
+#           path: ./versions.json
+#           key: dp
+#           value: ${{ needs.setup.outputs.next-dp-version }}
+
+#       - run: |
+#           echo "versions=${{ steps.update-dp-version.outputs.map }}"
+
+#       - uses: Abdullahi127/Custom_Actions/.github/actions/jsonWriter@main
+#         id: update-oc-version
+#         if: ${{ needs.check-diff.outputs.oc-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+#         with:
+#           path: ./versions.json
+#           key: oc
+#           value: ${{ needs.setup.outputs.next-oc-version }}
+
+#       - run: |
+#           echo "versions=${{ steps.update-oc-version.outputs.map }}"
+
+#       - uses: Abdullahi127/Custom_Actions/.github/actions/jsonWriter@main
+#         id: update-sim-version
+#         if: ${{ needs.check-diff.outputs.sim-changed == 'true' ||  needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+#         with:
+#           path: ./versions.json
+#           key: sim
+#           value: ${{ needs.setup.outputs.next-sim-version }}
+
+#       - run: |
+#           echo "versions=${{ steps.update-sim-version.outputs.map }}"
+
+#     # TODO uncomment when next version is added.
+#     # - name: commit changes
+#     #   run: |
+#     #     git config --global user.name "${GITHUB_ACTOR}"
+#     #     git config --global user.email "${GITHUB_ACTOR}"
+#     #     git add ./versions.json
+#     #     git commit -m "Update versions"
+#     #     git push

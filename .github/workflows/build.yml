@@ -299,8 +299,109 @@ jobs:
       next-dp-version: ${{ env.next-dp-version }}
       next-oc-version: ${{ env.next-oc-version }}
       next-sim-version: ${{ env.next-sim-version }}
-##### Old version 1
 
+  publish:
+    needs: [setup]
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout main branch.
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.main-branch-name }}
+          fetch-depth: 0
+
+      - name: Setup java
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "17"
+          cache: "gradle"
+
+      - name: set current versions.
+        run: |
+          chmod +x ./gradlew
+          ./gradlew ${{ inputs.core-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-core-version }} --alias=core
+          ./gradlew ${{ inputs.adp-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-adp-version }} --alias=adp
+          ./gradlew ${{ inputs.dp-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-dp-version }} --alias=dp
+          ./gradlew ${{ inputs.oc-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-oc-version }} --alias=oc
+          ./gradlew ${{ inputs.sim-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.current-sim-version }} --alias=sim
+
+      - name: build and publish core
+        if: ${{ needs.setup.outputs.core-changed == 'true' }}
+        run: |
+          chmod +x ./gradlew
+          ./gradlew ${{ inputs.core-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-core-version }} --alias=core
+          ./gradlew ${{ inputs.core-gradle-name }}:buildNPublish
+
+      - name: upload core
+        if: ${{ needs.setup.outputs.core-changed == 'true' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: deploy
+          path: ./${{ inputs.core-directory-name }}/build/libs
+          retention-days: 1
+
+      - name: build and publish adp
+        if: ${{ needs.setup.outputs.adp-changed == 'true' || needs.setup.outputs.core-changed == 'true' }}
+        run: |
+          chmod +x ./gradlew
+          ./gradlew ${{ inputs.adp-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-adp-version }} --alias=adp
+          ./gradlew ${{ inputs.adp-gradle-name }}:buildNPublish
+
+      - name: upload adp
+        if: ${{ needs.setup.outputs.adp-changed == 'true' || needs.setup.outputs.core-changed == 'true' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: deploy
+          path: ./${{ inputs.adp-directory-name }}/build/libs
+          retention-days: 1
+
+      - name: build and publish dp
+        if: ${{ needs.setup.outputs.dp-changed == 'true' || needs.setup.outputs.adp-changed == 'true' ||  needs.setup.outputs.core-changed == 'true' }}
+        run: |
+          chmod +x ./gradlew
+          ./gradlew  ${{ inputs.dp-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-dp-version }} --alias=dp
+          ./gradlew  ${{ inputs.dp-gradle-name }}:buildNPublish
+
+      - name: upload dp
+        if: ${{ needs.setup.outputs.dp-changed == 'true' || needs.setup.outputs.adp-changed == 'true' || needs.setup.outputs.core-changed == 'true' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: deploy
+          path: ./${{ inputs.dp-directory-name }}/build/libs
+          retention-days: 1
+
+      - name: build and publish oc
+        if: ${{ needs.setup.outputs.oc-changed == 'true' || needs.setup.outputs.adp-changed == 'true' ||  needs.setup.outputs.core-changed == 'true' }}
+        run: |
+          chmod +x ./gradlew
+          ./gradlew ${{ inputs.oc-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-oc-version }} --alias=oc
+          ./gradlew ${{ inputs.oc-gradle-name }}:buildNPublish
+
+      - name: upload oc
+        if: ${{ needs.setup.outputs.oc-changed == 'true' || needs.setup.outputs.adp-changed == 'true' || needs.setup.outputs.core-changed == 'true' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: deploy
+          path: ./${{ inputs.oc-directory-name }}/build/libs
+          retention-days: 1
+
+      - name: build and publish sim
+        if: ${{ needs.setup.outputs.sim-changed == 'true' || needs.setup.outputs.adp-changed == 'true' ||  needs.setup.outputs.core-changed == 'true' }}
+        run: |
+          chmod +x ./gradlew
+          ./gradlew ${{ inputs.sim-gradle-name }}:setProjectVersion --projectVersion=${{ needs.setup.outputs.next-sim-version }} --alias=sim
+          ./gradlew ${{ inputs.sim-gradle-name }}:buildNPublish
+
+      # Simulation is not needed to be deployed.
+      - name: upload sim.
+        if: ${{ needs.setup.outputs.sim-changed == 'true' || needs.setup.outputs.adp-changed == 'true' || needs.setup.outputs.core-changed == 'true' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: deploy
+          path: ./${{ inputs.sim-directory-name }}/build/libs
+          retention-days: 1
+##### Old version 1
 # on:
 #   workflow_call:
 #     inputs:

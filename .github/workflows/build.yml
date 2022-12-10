@@ -224,11 +224,6 @@ jobs:
   publish:
     needs: [setup, check-diff]
     runs-on: ubuntu-latest
-    env:
-      GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-      ARTIFACTORY_URL: ${{secrets.TK_MAVEN_URL}}
-      ARTIFACTORY_AUTH_TOKEN: ${{secrets.TK_PUSH_TOKEN}}
-
     steps:
       - name: checkout dev repo
         uses: actions/checkout@v3
@@ -242,9 +237,6 @@ jobs:
           distribution: "temurin"
           java-version: "17"
           cache: "gradle"
-
-      - name: Setup gradle.
-        uses: tkrgs/setup-gradle-publish@main
 
       - name: set current versions.
         run: |

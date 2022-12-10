@@ -204,19 +204,6 @@ jobs:
 
       - run: echo "next-sim-version=${{ steps.sim-next-version.outputs.nextVersion }}" >> $GITHUB_ENV
 
-      - name: Check the versions.
-        run: |
-          echo "current-core-version: ${{ env.current-core-version }}"
-          echo "current-adp-version: ${{ env.current-adp-version }}"
-          echo "current-dp-version: ${{ env.current-dp-version }}"
-          echo "current-oc-version: ${{ env.current-oc-version }}"
-          echo "current-sim-version: ${{ env.current-sim-version }}"
-          echo "next-core-version: ${{ env.next-core-version }}"
-          echo "next-adp-version: ${{ env.next-adp-version }}"
-          echo "next-dp-version: ${{ env.next-dp-version }}"
-          echo "next-oc-version: ${{ env.next-oc-version }}"
-          echo "next-sim-version: ${{ env.next-sim-version }}"
-
       # ------- Update meta data branch.
 
       - name: checkout meta data branch.
@@ -279,6 +266,19 @@ jobs:
 
       - run: |
           echo "versions=${{ steps.update-sim-version.outputs.map }}"
+
+      - name: Check the versions.
+        run: |
+          echo "current-core-version: ${{ env.current-core-version }}"
+          echo "current-adp-version: ${{ env.current-adp-version }}"
+          echo "current-dp-version: ${{ env.current-dp-version }}"
+          echo "current-oc-version: ${{ env.current-oc-version }}"
+          echo "current-sim-version: ${{ env.current-sim-version }}"
+          echo "next-core-version: ${{ env.next-core-version }}"
+          echo "next-adp-version: ${{ env.next-adp-version }}"
+          echo "next-dp-version: ${{ env.next-dp-version }}"
+          echo "next-oc-version: ${{ env.next-oc-version }}"
+          echo "next-sim-version: ${{ env.next-sim-version }}"
 
       - name: commit changes
         run: |

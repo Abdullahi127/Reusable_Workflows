@@ -105,7 +105,7 @@ jobs:
 
       #--- Get current versions.
 
-      - uses: tkrgs/thunderkick-actions/findprojectversion@main
+      - uses: Abdullahi127/Custom_Actions/.github/actions/findprojectversion@main
         id: current-core-version
         with:
           path: ./versions.json
@@ -113,7 +113,7 @@ jobs:
 
       - run: echo "current-core-version=${{ steps.current-core-version.outputs.value }}" >> $GITHUB_ENV
 
-      - uses: tkrgs/thunderkick-actions/findprojectversion@main
+      - uses: Abdullahi127/Custom_Actions/.github/actions/findprojectversion@main
         id: current-adp-version
         with:
           path: ./versions.json
@@ -121,7 +121,7 @@ jobs:
 
       - run: echo "current-adp-version=${{ steps.current-adp-version.outputs.value }}" >> $GITHUB_ENV
 
-      - uses: tkrgs/thunderkick-actions/findprojectversion@main
+      - uses: Abdullahi127/Custom_Actions/.github/actions/findprojectversion@main
         id: current-dp-version
         with:
           path: ./versions.json
@@ -129,7 +129,7 @@ jobs:
 
       - run: echo "current-dp-version=${{ steps.current-dp-version.outputs.value }}" >> $GITHUB_ENV
 
-      - uses: tkrgs/thunderkick-actions/findprojectversion@main
+      - uses: Abdullahi127/Custom_Actions/.github/actions/findprojectversion@main
         id: current-oc-version
         with:
           path: ./versions.json
@@ -137,7 +137,7 @@ jobs:
 
       - run: echo "current-oc-version=${{ steps.current-oc-version.outputs.value }}" >> $GITHUB_ENV
 
-      - uses: tkrgs/thunderkick-actions/findprojectversion@main
+      - uses: Abdullahi127/Custom_Actions/.github/actions/findprojectversion@main
         id: current-sim-version
         with:
           path: ./versions.json
@@ -151,7 +151,7 @@ jobs:
         run: |
           echo "commits=$(git log --oneline ${{ github.event.before }}...${{ github.event.after }} | tr '\n' ' ')" >> $GITHUB_ENV
 
-      - uses: tkrgs/thunderkick-actions/findnextversion@main
+      - uses: Abdullahi127/Custom_Actions/.github/actions/findnextversion@main
         id: core-next-version
         if: ${{ needs.check-diff.outputs.core-changed == 'true' }}
         with:
@@ -161,7 +161,7 @@ jobs:
 
       - run: echo "next-core-version=${{ steps.core-next-version.outputs.nextVersion }}" >> $GITHUB_ENV
 
-      - uses: tkrgs/thunderkick-actions/findnextversion@main
+      - uses: Abdullahi127/Custom_Actions/.github/actions/findnextversion@main
         id: adp-next-version
         if: ${{ needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         with:
@@ -171,7 +171,7 @@ jobs:
 
       - run: echo "next-adp-version=${{ steps.adp-next-version.outputs.nextVersion }}" >> $GITHUB_ENV
 
-      - uses: tkrgs/thunderkick-actions/findnextversion@main
+      - uses: Abdullahi127/Custom_Actions/.github/actions/findnextversion@main
         id: dp-next-version
         if: ${{ needs.check-diff.outputs.dp-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         with:
@@ -181,7 +181,7 @@ jobs:
 
       - run: echo "next-dp-version=${{ steps.dp-next-version.outputs.nextVersion }}" >> $GITHUB_ENV
 
-      - uses: tkrgs/thunderkick-actions/findnextversion@main
+      - uses: Abdullahi127/Custom_Actions/.github/actions/findnextversion@main
         id: oc-next-version
         if: ${{ needs.check-diff.outputs.oc-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         with:
@@ -191,7 +191,7 @@ jobs:
 
       - run: echo "next-oc-version=${{ steps.oc-next-version.outputs.nextVersion }}" >> $GITHUB_ENV
 
-      - uses: tkrgs/thunderkick-actions/findnextversion@main
+      - uses: Abdullahi127/Custom_Actions/.github/actions/findnextversion@main
         id: sim-next-version
         if: ${{ needs.check-diff.outputs.sim-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         with:
@@ -341,7 +341,7 @@ jobs:
           ref: version
           fetch-depth: 0
 
-      - uses: tkrgs/thunderkick-actions/setprojectversion@main
+      - uses: Abdullahi127/Custom_Actions/.github/actions/setprojectversion@main
         id: update-core-version
         if: ${{ needs.check-diff.outputs.core-changed == 'true' }}
         with:
@@ -352,7 +352,7 @@ jobs:
       - run: |
           echo "versions=${{ steps.update-core-version.outputs.map }}"
 
-      - uses: tkrgs/thunderkick-actions/setprojectversion@main
+      - uses: Abdullahi127/Custom_Actions/.github/actions/setprojectversion@main
         id: update-adp-version
         if: ${{ needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         with:
@@ -363,7 +363,7 @@ jobs:
       - run: |
           echo "versions=${{ steps.update-adp-version.outputs.map }}"
 
-      - uses: tkrgs/thunderkick-actions/setprojectversion@main
+      - uses: Abdullahi127/Custom_Actions/.github/actions/setprojectversion@main
         id: update-dp-version
         if: ${{ needs.check-diff.outputs.dp-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         with:
@@ -374,7 +374,7 @@ jobs:
       - run: |
           echo "versions=${{ steps.update-dp-version.outputs.map }}"
 
-      - uses: tkrgs/thunderkick-actions/setprojectversion@main
+      - uses: Abdullahi127/Custom_Actions/.github/actions/setprojectversion@main
         id: update-oc-version
         if: ${{ needs.check-diff.outputs.oc-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         with:
@@ -385,7 +385,7 @@ jobs:
       - run: |
           echo "versions=${{ steps.update-oc-version.outputs.map }}"
 
-      - uses: tkrgs/thunderkick-actions/setprojectversion@main
+      - uses: Abdullahi127/Custom_Actions/.github/actions/setprojectversion@main
         id: update-sim-version
         if: ${{ needs.check-diff.outputs.sim-changed == 'true' ||  needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
         with:

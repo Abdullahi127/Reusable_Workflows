@@ -156,7 +156,7 @@ jobs:
 
       - uses: Abdullahi127/Custom_Actions/.github/actions/findnextversion@main
         id: core-next-version
-        if: ${{ needs.check-diff.outputs.core-changed == 'true' }}
+        if: ${{ env.core-changed == 'true' }}
         with:
           projectName: "core"
           currentVersion: ${{ env.current-core-version }}
@@ -166,7 +166,7 @@ jobs:
 
       - uses: Abdullahi127/Custom_Actions/.github/actions/findnextversion@main
         id: adp-next-version
-        if: ${{ needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+        if: ${{ env.adp-changed == 'true' || env.core-changed == 'true' }}
         with:
           projectName: "adp"
           currentVersion: ${{ env.current-adp-version }}
@@ -176,7 +176,7 @@ jobs:
 
       - uses: Abdullahi127/Custom_Actions/.github/actions/findnextversion@main
         id: dp-next-version
-        if: ${{ needs.check-diff.outputs.dp-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+        if: ${{ env.dp-changed == 'true' || env.adp-changed == 'true' || env.core-changed == 'true' }}
         with:
           projectName: "dp"
           currentVersion: ${{ env.current-dp-version }}
@@ -186,7 +186,7 @@ jobs:
 
       - uses: Abdullahi127/Custom_Actions/.github/actions/findnextversion@main
         id: oc-next-version
-        if: ${{ needs.check-diff.outputs.oc-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+        if: ${{ env.oc-changed == 'true' || env.adp-changed == 'true' || env.core-changed == 'true' }}
         with:
           projectName: "oc"
           currentVersion: ${{ env.current-oc-version }}
@@ -196,7 +196,7 @@ jobs:
 
       - uses: Abdullahi127/Custom_Actions/.github/actions/findnextversion@main
         id: sim-next-version
-        if: ${{ needs.check-diff.outputs.sim-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+        if: ${{ env.sim-changed == 'true' || env.adp-changed == 'true' || env.core-changed == 'true' }}
         with:
           projectName: "sim"
           currentVersion: ${{ env.current-sim-version }}
@@ -214,55 +214,55 @@ jobs:
 
       - uses: Abdullahi127/Custom_Actions/.github/actions/setprojectversion@main
         id: update-core-version
-        if: ${{ needs.check-diff.outputs.core-changed == 'true' }}
+        if: ${{ env.core-changed == 'true' }}
         with:
           path: ./versions.json
           key: core
-          value: ${{ needs.setup.outputs.next-core-version }}
+          value: ${{ env.next-core-version }}
 
       - run: |
           echo "versions=${{ steps.update-core-version.outputs.map }}"
 
       - uses: Abdullahi127/Custom_Actions/.github/actions/setprojectversion@main
         id: update-adp-version
-        if: ${{ needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+        if: ${{ env.adp-changed == 'true' || env.core-changed == 'true' }}
         with:
           path: ./versions.json
           key: adp
-          value: ${{ needs.setup.outputs.next-adp-version }}
+          value: ${{ env.next-adp-version }}
 
       - run: |
           echo "versions=${{ steps.update-adp-version.outputs.map }}"
 
       - uses: Abdullahi127/Custom_Actions/.github/actions/setprojectversion@main
         id: update-dp-version
-        if: ${{ needs.check-diff.outputs.dp-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+        if: ${{ env.dp-changed == 'true' || env.adp-changed == 'true' || env.core-changed == 'true' }}
         with:
           path: ./versions.json
           key: dp
-          value: ${{ needs.setup.outputs.next-dp-version }}
+          value: ${{ env.next-dp-version }}
 
       - run: |
           echo "versions=${{ steps.update-dp-version.outputs.map }}"
 
       - uses: Abdullahi127/Custom_Actions/.github/actions/setprojectversion@main
         id: update-oc-version
-        if: ${{ needs.check-diff.outputs.oc-changed == 'true' || needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+        if: ${{ env.oc-changed == 'true' || env.adp-changed == 'true' || env.core-changed == 'true' }}
         with:
           path: ./versions.json
           key: oc
-          value: ${{ needs.setup.outputs.next-oc-version }}
+          value: ${{ env.next-oc-version }}
 
       - run: |
           echo "versions=${{ steps.update-oc-version.outputs.map }}"
 
       - uses: Abdullahi127/Custom_Actions/.github/actions/setprojectversion@main
         id: update-sim-version
-        if: ${{ needs.check-diff.outputs.sim-changed == 'true' ||  needs.check-diff.outputs.adp-changed == 'true' || needs.check-diff.outputs.core-changed == 'true' }}
+        if: ${{ env.sim-changed == 'true' ||  env.adp-changed == 'true' || env.core-changed == 'true' }}
         with:
           path: ./versions.json
           key: sim
-          value: ${{ needs.setup.outputs.next-sim-version }}
+          value: ${{ env.next-sim-version }}
 
       - run: |
           echo "versions=${{ steps.update-sim-version.outputs.map }}"

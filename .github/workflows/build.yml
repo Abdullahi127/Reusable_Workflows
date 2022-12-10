@@ -67,6 +67,11 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
+      - name: branches.
+        run: |
+          echo "main branch: ${{ inputs.main-branch-name }}"
+          echo "Meta branch: ${{ inputs.meta-data-branch-name }}"
+
       #--- Check project changes.
 
       - name: Checkout to main branch.
